@@ -17,18 +17,24 @@
   <h1>🤖 MLB AI Insights Tester</h1>
   
   <h2>Team Insights</h2>
-  <input type="text" id="teamId" placeholder="Enter Team ID (e.g., 147)" />
+  <!-- ✅ Fixed: input ID is now teamName, placeholder is helpful -->
+  <input
+    type="text"
+    id="teamName"
+    placeholder="Enter team name (e.g., Reds, Yankees, Dodgers)"
+    onkeydown="if(event.key==='Enter') getTeamInsights()"
+  />
   <button onclick="getTeamInsights()">Get Insights</button>
   
   <div id="result"></div>
 
   <script>
     async function getTeamInsights() {
-      const teamId = document.getElementById('teamId').value;
+      const teamName = document.getElementById('teamName').value.trim(); // ✅ reads teamName
       const resultDiv = document.getElementById('result');
       
-      if (!teamId) {
-        alert('Please enter a team ID');
+      if (!teamName) {
+        alert('Please enter a team name');
         return;
       }
 
@@ -38,9 +44,8 @@
         const response = await fetch('/api/insights/team', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ teamId })
+          body: JSON.stringify({ teamName })  // ✅ sends teamName, not teamId
         });
-
         const data = await response.json();
         resultDiv.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
       } catch (error) {
