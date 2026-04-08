@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MLB AI Insights - Advanced Baseball Analytics Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #FF6B35;
+            --secondary: #004E89;
+            --accent: #00D9FF;
+            --dark: #0A0E27;
+            --darker: #050812;
+            --light: #F7F9FC;
+            --success: #00C896;
+            --warning: #FFB627;
+        }
+
+        body {
+            font-family: 'Work Sans', sans-serif;
+            background: var(--darker);
+            color: var(--light);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Animated Background */
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 217, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 217, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        .gradient-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .orb-1 {
+            width: 600px;
+            height: 600px;
+            background: var(--primary);
+            top: -200px;
+            right: -200px;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .orb-2 {
+            width: 500px;
+            height: 500px;
+            background: var(--accent);
+            bottom: -150px;
+            left: -150px;
+            animation: float 25s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(50px, 50px) scale(1.1); }
+        }
+
+        /* Header */
+        header {
+            position: relative;
+            z-index: 10;
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            background: rgba(10, 14, 39, 0.8);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 800;
+            font-family: 'Syne', sans-serif;
+            box-shadow: 0 8px 32px rgba(255, 107, 53, 0.3);
+        }
+
+        .logo-text h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--light), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-text p {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: -4px;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(0, 200, 150, 0.1);
+            border: 1px solid var(--success);
+            border-radius: 50px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        /* Main Container */
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            margin-bottom: 4rem;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero h2 {
+            font-family: 'Syne', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+            letter-spacing: -2px;
+        }
+
+        .hero .gradient-text {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.6);
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.8s ease-out;
+            animation-fill-mode: both;
+        }
+
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) { animation-delay: 0.3s; }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+            background: rgba(255, 255, 255, 0.04);
+            box-shadow: 0 20px 60px rgba(0, 217, 255, 0.15);
+        }
+
+        .stat-label {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-family: 'Syne', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--light);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-desc {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+        }
+
+        /* Insights Panel */
+        .insights-panel {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            padding: 3rem;
+            backdrop-filter: blur(10px);
+            animation: fadeInUp 0.8s ease-out 0.4s;
+            animation-fill-mode: both;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .panel-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .panel-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        /* Form Section */
+        .form-section {
+            margin-bottom: 2rem;
+        }
+
+        label {
+            display: block;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--accent);
+            margin-bottom: 0.75rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: var(--light);
+            font-size: 1rem;
+            font-family: 'Work Sans', sans-serif;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--accent);
+            background: rgba(0, 0, 0, 0.5);
+            box-shadow: 0 0 0 4px rgba(0, 217, 255, 0.1);
+        }
+
+        select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%2300D9FF' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1.25rem center;
+            padding-right: 3rem;
+        }
+
+        option {
+            background: var(--dark);
+            color: var(--light);
+        }
+
+        .btn {
+            padding: 1.25rem 3rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border: none;
+            border-radius: 12px;
+            color: var(--darker);
+            font-family: 'Syne', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 32px rgba(255, 107, 53, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 48px rgba(255, 107, 53, 0.5);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        /* Loading State */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 3rem;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 1.5rem;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Results Section */
+        .results {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .results.active {
+            display: block;
+        }
+
+        .insight-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 4px solid var(--accent);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .insight-card:hover {
+            background: rgba(0, 0, 0, 0.5);
+            transform: translateX(8px);
+        }
+
+        .insight-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .insight-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .insight-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--light);
+        }
+
+        .insight-content {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.8;
+            margin-left: 56px;
+        }
+
+        .error-message {
+            display: none;
+            background: rgba(255, 107, 53, 0.1);
+            border: 1px solid var(--primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            color: var(--primary);
+            margin-top: 1rem;
+        }
+
+        .error-message.active {
+            display: block;
+            animation: shake 0.5s ease-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        /* Footer */
+        footer {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 3rem 2rem;
+            margin-top: 4rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        footer p {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .tech-stack {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .tech-badge {
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-family: 'IBM Plex Mono', monospace;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h2 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .insights-panel {
+                padding: 2rem;
+            }
+
+            .panel-title {
+                font-size: 1.5rem;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="gradient-orb orb-1"></div>
+    <div class="gradient-orb orb-2"></div>
+
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">⚾</div>
+                <div class="logo-text">
+                    <h1>MLB AI Insights</h1>
+                    <p>Advanced Analytics</p>
+                </div>
+            </div>
+            <div class="status-badge">
+                <div class="status-dot"></div>
+                <span>System Online</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="hero">
+            <h2>
+                Next-Generation<br>
+                <span class="gradient-text">Baseball Intelligence</span>
+            </h2>
+            <p>Powered by advanced AI to deliver real-time insights, predictive analytics, and strategic recommendations for MLB teams.</p>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="stat-card">
+                <div class="stat-label">Teams Analyzed</div>
+                <div class="stat-value">30</div>
+                <div class="stat-desc">Complete MLB coverage</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Data Points</div>
+                <div class="stat-value">1M+</div>
+                <div class="stat-desc">Real-time statistics</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Accuracy Rate</div>
+                <div class="stat-value">94%</div>
+                <div class="stat-desc">Prediction confidence</div>
+            </div>
+        </div>
+
+        <div class="insights-panel">
+            <div class="panel-header">
+                <div class="panel-title">
+                    <div class="panel-icon">🎯</div>
+                    Team Analysis Engine
+                </div>
+            </div>
+
+            <form id="insightsForm">
+                <div class="form-section">
+                    <label for="teamSelect">Select MLB Team</label>
+                    <div class="input-wrapper">
+                        <select id="teamSelect" required>
+                            <option value="">Choose a team...</option>
+                            <option value="yankees">New York Yankees</option>
+                            <option value="dodgers">Los Angeles Dodgers</option>
+                            <option value="redsox">Boston Red Sox</option>
+                            <option value="astros">Houston Astros</option>
+                            <option value="braves">Atlanta Braves</option>
+                            <option value="mets">New York Mets</option>
+                            <option value="cubs">Chicago Cubs</option>
+                            <option value="phillies">Philadelphia Phillies</option>
+                            <option value="padres">San Diego Padres</option>
+                            <option value="giants">San Francisco Giants</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn" id="submitBtn">
+                    Generate AI Insights
+                </button>
+            </form>
+
+            <div class="error-message" id="errorMessage"></div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p style="color: var(--accent); font-family: 'IBM Plex Mono', monospace; text-transform: uppercase; letter-spacing: 2px; font-size: 0.9rem;">Analyzing team data...</p>
+            </div>
+
+            <div class="results" id="results">
+                <!-- Results will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 MLB AI Insights Platform - Professional Edition</p>
+        <div class="tech-stack">
+            <div class="tech-badge">AI-Powered</div>
+            <div class="tech-badge">Real-Time Data</div>
+            <div class="tech-badge">Cloud-Based</div>
+            <div class="tech-badge">Enterprise Ready</div>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('insightsForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const teamSelect = document.getElementById('teamSelect');
+            const submitBtn = document.getElementById('submitBtn');
+            const loading = document.getElementById('loading');
+            const results = document.getElementById('results');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            // Reset states
+            results.classList.remove('active');
+            errorMessage.classList.remove('active');
+            
+            // Show loading
+            submitBtn.disabled = true;
+            loading.classList.add('active');
+            
+            try {
+                // Simulate API call - replace with your actual endpoint
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                // Mock insights - replace with actual API response
+                const insights = generateMockInsights(teamSelect.value);
+                displayResults(insights);
+                
+            } catch (error) {
+                errorMessage.textContent = 'Failed to generate insights. Please try again.';
+                errorMessage.classList.add('active');
+            } finally {
+                loading.classList.remove('active');
+                submitBtn.disabled = false;
+            }
+        });
+        
+        function generateMockInsights(team) {
+            const teamNames = {
+                'yankees': 'New York Yankees',
+                'dodgers': 'Los Angeles Dodgers',
+                'redsox': 'Boston Red Sox',
+                'astros': 'Houston Astros',
+                'braves': 'Atlanta Braves',
+                'mets': 'New York Mets',
+                'cubs': 'Chicago Cubs',
+                'phillies': 'Philadelphia Phillies',
+                'padres': 'San Diego Padres',
+                'giants': 'San Francisco Giants'
+            };
+            
+            return {
+                team: teamNames[team] || team,
+                insights: [
+                    {
+                        icon: '📊',
+                        title: 'Performance Analysis',
+                        content: 'Strong offensive performance with a team batting average of .267. The lineup shows consistent power with 45 home runs in the last 30 games.'
+                    },
+                    {
+                        icon: '⚡',
+                        title: 'Key Strengths',
+                        content: 'Elite pitching rotation with a combined ERA of 3.21. Bullpen depth is exceptional with three reliable closers maintaining a 92% save rate.'
+                    },
+                    {
+                        icon: '🎯',
+                        title: 'Strategic Recommendations',
+                        content: 'Focus on maintaining current momentum. Consider increasing rest days for starting pitchers to prevent late-season fatigue and optimize playoff performance.'
+                    },
+                    {
+                        icon: '📈',
+                        title: 'Predictive Outlook',
+                        content: 'Current trajectory suggests 94-68 season finish. Playoff probability at 87% based on remaining schedule strength and divisional standings.'
+                    }
+                ]
+            };
+        }
+        
+        function displayResults(data) {
+            const results = document.getElementById('results');
+            
+            let html = `<h3 style="font-family: 'Syne', sans-serif; font-size: 1.8rem; margin-bottom: 2rem; color: var(--accent);">${data.team} - AI Analysis</h3>`;
+            
+            data.insights.forEach(insight => {
+                html += `
+                    <div class="insight-card">
+                        <div class="insight-header">
+                            <div class="insight-icon">${insight.icon}</div>
+                            <div class="insight-title">${insight.title}</div>
+                        </div>
+                        <div class="insight-content">${insight.content}</div>
+                    </div>
+                `;
+            });
+            
+            results.innerHTML = html;
+            results.classList.add('active');
+        }
+    </script>
+</body>
+</html>
