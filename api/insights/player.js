@@ -1,23 +1,22 @@
 // api/insights/player.js
-import { fetchPlayerRecentGames } from "../../lib/mlb";
-import { generatePlayerInsights } from "../../lib/llm";
+import { fetchPlayerData } from "../../lib/mlb";
+import { generateGameInsights } from "../../lib/llm";
 import { playerInsightsPrompt } from "../../lib/prompts";
-
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
   try {
-    const { playerId, games } = req.body;
+    const { playerId } = req.body;
     if (!playerId) return res.status(400).json({ error: "playerId is required" });
 
-    const playerData = await fetchPlayerRecentGames(playerId, games || 10);
-    const insights = await generatePlayerInsights(playerData, playerInsightsPrompt);
+    const playerData = await fetchPlayerData(playerId);
+    const insights = await generateGameInsights(playerData, playerInsightsPrompt);
 
     res.status(200).json(insights);
- } catch (err) {
-  console.error("ERROR:", err);
-  return res.status(500).json({ error: err.message || "Unknown error" });
+  } catch (err) {
+    console.error("PLAYER ERROR:", err);
+    res.status(500).json({ error: err.message || "Failed to generate player insights" });
   }
 }
