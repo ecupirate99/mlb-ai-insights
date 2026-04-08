@@ -1,7 +1,7 @@
 // api/insights/player.js
-import { fetchPlayerData } from "../../lib/mlb";
-import { generateGameInsights } from "../../lib/llm";
-import { playerInsightsPrompt } from "../../lib/prompts";
+import { fetchPlayerData } from "../../lib/mlb.js";
+import { generateGameInsights } from "../../lib/llm.js";
+import { playerInsightsPrompt } from "../../lib/prompts.js";
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
