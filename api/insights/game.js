@@ -1,5 +1,5 @@
 // api/insights/game.js
-import { fetchGameData } from "../../../lib/mlb";
+import { fetchGameData } from "../../../lib/mlb.js";
 import { generateGameInsights } from "../../../lib/llm";
 import { gameInsightsPrompt } from "../../../lib/prompts";
 
