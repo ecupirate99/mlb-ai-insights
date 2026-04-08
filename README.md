@@ -1,26 +1,35 @@
 # ⚾ MLB AI Insights API
 
-An AI-powered MLB insights API built on Vercel Serverless Functions.  
-It transforms raw MLB Stats API data into human-like summaries, player trends, and team insights using an LLM.
+The **MLB AI Insights API** is a lightweight, production‑ready baseball intelligence engine that blends **real MLB StatsAPI data** with **AI‑generated analysis**.  
+It provides game, player, and team insights in clean JSON — perfect for apps, dashboards, betting tools, fantasy platforms, and baseball content creators.
+
+Deployed on **Vercel** with serverless functions and powered by **Google Gemini** for natural‑language insights.
 
 ---
 
-## 🚀 Features
+## 🚀 Live Demo (UI Tester)
 
-- AI-generated game summaries  
-- Player trend analysis  
-- Team performance insights  
-- JSON-only responses  
-- Serverless, auto-scaling architecture  
-- Easy to integrate into apps, dashboards, and fantasy tools  
+A simple browser‑based tester is deployed here:
+
+**https://mlb-ai-insights.vercel.app**
+
+You can test:
+- Team insights  
+- Player insights  
+- Game insights  
+- Today’s MLB games (auto‑fetch game IDs)
 
 ---
 
-## 📡 Endpoints
+## 📡 API Endpoints
 
-### POST `/api/insights/game`
-Generate AI insights for a specific MLB game.
+All endpoints accept **POST** with JSON bodies.
 
-**Body:**
+### 1. `/api/insights/team`
+Generate AI insights for any MLB team.
+
+#### Request (by name)
 ```json
-{ "gameId": 123456 }
+{
+  "teamName": "Mets"
+}
