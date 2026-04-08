@@ -1,6 +1,6 @@
 // api/insights/team.js
-import { fetchTeamRecentGames } from "../../lib/mlb.js";
-import { generateTeamInsights } from "../../lib/llm.js";
+import { fetchTeamData, searchTeamByName } from "../../lib/mlb.js";
+import { generateGameInsights } from "../../lib/llm.js";
 import { teamInsightsPrompt } from "../../lib/prompts.js";
 
 export default async function handler(req, res) {
@@ -9,15 +9,24 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { teamId } = req.body;
-    if (!teamId) return res.status(400).json({ error: "teamId is required" });
+    let { teamId, teamName } = req.body;
 
-    const teamData = await fetchTeamRecentGames(teamId);
-    const insights = await generateTeamInsights(teamData, teamInsightsPrompt);
+    // Allow name lookup
+    if (!teamId && teamName) {
+      teamId = await searchTeamByName(teamName);
+    }
+
+    if (!teamId) {
+      return res.status(400).json({ error: "teamId or teamName is required" });
+    }
+
+    const teamData = await fetchTeamData(teamId);
+
+    const insights = await generateGameInsights(teamData, teamInsightsPrompt);
 
     res.status(200).json(insights);
- } catch (err) {
-  console.error("ERROR:", err);
-  return res.status(500).json({ error: err.message || "Unknown error" });
+  } catch (err) {
+    console.error("TEAM ERROR:", err);
+    res.status(500).json({ error: err.message || "Failed to generate team insights" });
   }
 }
