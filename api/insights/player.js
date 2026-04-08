@@ -1,7 +1,7 @@
 // api/insights/player.js
-import { fetchPlayerRecentGames } from "../../../lib/mlb";
-import { generatePlayerInsights } from "../../../lib/llm";
-import { playerInsightsPrompt } from "../../../lib/prompts";
+import { fetchPlayerRecentGames } from "../../lib/mlb";
+import { generatePlayerInsights } from "../../lib/llm";
+import { playerInsightsPrompt } from "../../lib/prompts";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
