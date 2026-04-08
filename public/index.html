@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MLB AI Insights Tester</title>
+  <style>
+    body { font-family: system-ui; max-width: 800px; margin: 40px auto; padding: 20px; }
+    input, button { padding: 10px; font-size: 16px; }
+    button { background: #0070f3; color: white; border: none; cursor: pointer; }
+    button:hover { background: #0051cc; }
+    pre { background: #f5f5f5; padding: 15px; overflow-x: auto; }
+    .loading { color: #666; }
+  </style>
+</head>
+<body>
+  <h1>🤖 MLB AI Insights Tester</h1>
+  
+  <h2>Team Insights</h2>
+  <input type="text" id="teamId" placeholder="Enter Team ID (e.g., 147)" />
+  <button onclick="getTeamInsights()">Get Insights</button>
+  
+  <div id="result"></div>
+
+  <script>
+    async function getTeamInsights() {
+      const teamId = document.getElementById('teamId').value;
+      const resultDiv = document.getElementById('result');
+      
+      if (!teamId) {
+        alert('Please enter a team ID');
+        return;
+      }
+
+      resultDiv.innerHTML = '<p class="loading">Loading...</p>';
+
+      try {
+        const response = await fetch('/api/insights/team', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ teamId })
+        });
+
+        const data = await response.json();
+        resultDiv.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+      } catch (error) {
+        resultDiv.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+      }
+    }
+  </script>
+</body>
+</html>
