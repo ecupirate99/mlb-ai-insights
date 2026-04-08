@@ -1,5 +1,5 @@
 // api/insights/team.js
-import { fetchTeamData, searchTeamByName } from "../../lib/mlb.js";
+import { fetchTeamData, fetchTeamRecentGames, searchTeamByName } from "../../lib/mlb.js";
 import { generateTeamInsights } from "../../lib/llm.js";
 import { teamInsightsPrompt } from "../../lib/prompts.js";
 
@@ -11,15 +11,11 @@ export default async function handler(req, res) {
   try {
     let teamId, teamName;
 
-    // Handle multiple input formats
     if (typeof req.body === 'string') {
-      // Plain text: "mets"
       teamName = req.body.trim();
     } else if (req.body.teamName) {
-      // JSON: { "teamName": "mets" }
       teamName = req.body.teamName;
     } else if (req.body.teamId) {
-      // JSON: { "teamId": 121 }
       teamId = req.body.teamId;
     } else {
       return res.status(400).json({ 
@@ -32,23 +28,34 @@ export default async function handler(req, res) {
       });
     }
 
-    // Convert team name to ID if needed
     if (!teamId && teamName) {
       teamId = await searchTeamByName(teamName);
       if (!teamId) {
         return res.status(404).json({ 
           error: `Team not found: "${teamName}"`,
-          hint: "Try 'Yankees', 'Mets', 'Dodgers', etc."
+          hint: "Try 'Yankees', 'Mets', 'Dodgers', 'Reds', etc."
         });
       }
     }
 
     console.log(`Fetching insights for team: ${teamName || teamId} (ID: ${teamId})`);
 
-    const teamData = await fetchTeamData(teamId);
-    const insights = await generateTeamInsights(teamData, teamInsightsPrompt);
+    // ✅ Fetch BOTH team info and recent games in parallel
+    const [teamData, recentGamesData] = await Promise.all([
+      fetchTeamData(teamId),
+      fetchTeamRecentGames(teamId, 10)
+    ]);
 
+    // ✅ Combine into a rich object for the LLM
+    const enrichedTeamData = {
+      ...teamData,
+      recentGames: recentGamesData.recentGames,
+      season: recentGamesData.season
+    };
+
+    const insights = await generateTeamInsights(enrichedTeamData, teamInsightsPrompt);
     res.status(200).json(insights);
+
   } catch (err) {
     console.error("TEAM ERROR:", err);
     return res.status(500).json({ error: err.message });
